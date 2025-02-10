@@ -59,14 +59,27 @@ The JSON key file will be downloaded to your computer (save it as ./service-acco
 
 ## Activate the GcpPublisher
 
-Uncomment
+Uncomment GCP  in pom.xml
+```xml
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
+		<!-- Spring Integration GCP Pub/Sub -->
+		<!-- <dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
+		</dependency> -->
+```
 
+and in java code
 ```java
 // @Configuration
 public class GcpPublisher {
 ```
 
-Edit `application.yaml`
+Enable the GCP part in `application.yaml`
 ```yaml
 spring:
 ...
@@ -79,4 +92,6 @@ spring:
           location: file:service-account-key.json
 ```
 
-`mvn spring-boot:run` will now run WITH GCP publishing.
+
+
+Now `mvn spring-boot:run` will now run WITH GCP publishing.
