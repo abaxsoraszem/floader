@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-file="http://www.springframework.org/schema/integration/file"
+       xmlns:int-gcp="http://www.springframework.org/schema/integration/gcp"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+        http://www.springframework.org/schema/integration/gcp http://www.springframework.org/schema/integration/gcp/spring-integration-gcp.xsd">
+
+    <!-- Message Channel (Publish-Subscribe) -->
+    <int:publish-subscribe-channel id="transactionChannel"/>
+    <int:publish-subscribe-channel id="stringTransactionChannel"/>
+    <int:publish-subscribe-channel id="jsonTransactionChannel"/>
+
+
+    <!-- Subscribers -->
+    
+    <!-- Log Subscriber -->
+    <int:logging-channel-adapter id="logSubscriber" channel="transactionChannel" level="INFO"/>
+
+    <!-- File Subscriber -->
+
+    <!-- <int:transformer input-channel="transactionChannel" output-channel="stringTransactionChannel">
+        <bean class="org.springframework.integration.transformer.ObjectToStringTransformer"/>
+    </int:transformer> -->
+    <!-- <int-file:outbound-channel-adapter id="fileSubscriber"
+                                       channel="stringTransactionChannel"
+                                       directory="file:/tmp"
+                                       filename-generator="fileNameGenerator"
+                                       />
+    <bean id="fileNameGenerator" class="org.springframework.integration.file.DefaultFileNameGenerator"/> -->
+
+
+    <!-- GCP Pub/Sub Subscriber is set up programatically-->
+
+    <int:transformer input-channel="transactionChannel" output-channel="jsonTransactionChannel">
+        <bean class="org.springframework.integration.json.ObjectToJsonTransformer"/>
+    </int:transformer>
+
+</beans>

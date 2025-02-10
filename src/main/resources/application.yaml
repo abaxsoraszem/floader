@@ -1,0 +1,21 @@
+
+spring:
+  application:
+    name: floader
+  integration:
+    enabled: true
+  cloud:
+    gcp:
+      pubsub:
+        enabled: true
+        project-id: transaction-load
+        credentials:
+          location: file:service-account-key.json
+
+floader:
+  max-transactions: 1000
+  iban-prefix: DE12345678 
+  accounts-count: 100
+  cooldown-seconds: 5
+
+
