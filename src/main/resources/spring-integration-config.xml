@@ -19,7 +19,7 @@
     <!-- Subscribers -->
     
     <!-- Log Subscriber -->
-    <int:logging-channel-adapter id="logSubscriber" channel="transactionChannel" level="INFO"/>
+    <int:logging-channel-adapter id="logSubscriber" channel="transactionChannel" level="DEBUG"/>
 
     <!-- File Subscriber -->
 

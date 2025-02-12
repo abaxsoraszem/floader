@@ -9,32 +9,33 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
 
-// import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-// import com.google.cloud.spring.pubsub.integration.outbound.PubSubMessageHandler;
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import com.google.cloud.spring.pubsub.integration.outbound.PubSubMessageHandler;
 
-// @Configuration
+
+@Configuration
 public class GcpPublisher {
     Logger logger = LoggerFactory.getLogger(GcpPublisher.class);
 
     AtomicInteger counter = new AtomicInteger(0);
 
-    // @Bean
-    // @ServiceActivator(inputChannel = "jsonTransactionChannel")
-    // public MessageHandler messageSender(PubSubTemplate pubsubTemplate) {
-    //     PubSubMessageHandler adapter = new PubSubMessageHandler(pubsubTemplate, "transactions");
+    @Bean
+    @ServiceActivator(inputChannel = "jsonTransactionChannel")
+    public MessageHandler messageSender(PubSubTemplate pubsubTemplate) {
+        PubSubMessageHandler adapter = new PubSubMessageHandler(pubsubTemplate, "transactions");
 
-    //     adapter.setSuccessCallback
-    //             ((ackId, message) -> {
-    //                 int x = counter.incrementAndGet();
-    //                 if (x % 100 == 0) {
-    //                     logger.info("Message sent {}", message.getPayload());
-    //                 }
-    //                 logger.debug("Message sent {}", message.getPayload());
-    //             });
+        adapter.setSuccessCallback
+                ((ackId, message) -> {
+                    int x = counter.incrementAndGet();
+                    if (x % 100 == 0) {
+                        logger.info("Message sent {}", message.getPayload());
+                    }
+                    logger.debug("Message sent {}", message.getPayload());
+                });
 
-    //     adapter.setFailureCallback(
-    //             (cause, message) -> logger.info("Error sending " + message + " due to " + cause));
+        adapter.setFailureCallback(
+                (cause, message) -> logger.info("Error sending " + message + " due to " + cause));
 
-    //     return adapter;
-    // }
+        return adapter;
+    }
 }
