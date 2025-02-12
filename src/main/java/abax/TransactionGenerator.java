@@ -41,8 +41,7 @@ public class TransactionGenerator {
 
     private final ConfigurableApplicationContext context;
 
-
-    private String[] ibans;
+    private Account[] accounts;
     private CountDownLatch latch;
 
     public TransactionGenerator(TransactionGateway transactionGateway, ConfigurableApplicationContext context) {
@@ -52,9 +51,10 @@ public class TransactionGenerator {
 
     @PostConstruct
     public void init() {
-        ibans = new String[accountsCount];
+        accounts = new Account[accountsCount];
         IntStream.range(0, accountsCount)
-                .forEach(i -> ibans[i] = ibanPrefix + Math.round(1000000 + Math.random() * 8000000));
+                .forEach(i -> accounts[i] = new Account(ibanPrefix + Math.round(1000000 + Math.random() * 8000000),
+                        currency()));
 
         latch = new CountDownLatch(maxTransactions);
     }
@@ -62,7 +62,7 @@ public class TransactionGenerator {
     @Scheduled(fixedDelay = 10000)
     public void checkForShutdown() throws InterruptedException {
         if (latch.getCount() <= 0) {
-            logger.warn("All transactions generated, shutting down in {} sec...",cooldownSeconds);
+            logger.warn("All transactions generated, shutting down in {} sec...", cooldownSeconds);
             Thread.sleep(cooldownSeconds * 1000);
             logger.warn("Shutdown now");
 
@@ -76,8 +76,14 @@ public class TransactionGenerator {
         logger.warn("Generating {} transactions {}", maxTransactions);
         IntStream.range(0, maxTransactions).forEach(i -> executor.execute(() -> {
             // String transaction = "Transaction ID: " + UUID.randomUUID();
-            Transaction transaction = new Transaction(UUID.randomUUID().toString(), transactionType(), iban(), amount(),
-                    currency(),
+            Account selectedAccount = accounts[(int) (Math.random() * accounts.length)];
+            Transaction transaction = 
+                new Transaction(
+                    UUID.randomUUID().toString(), 
+                    transactionType(), 
+                    selectedAccount.getIban(), 
+                    amount(),
+                    selectedAccount.getCurrency(),
                     remittenceInfo());
             logger.debug("Generated {}", transaction);
             transactionGateway.send(transaction);
@@ -113,9 +119,7 @@ public class TransactionGenerator {
         return types[(int) (Math.random() * types.length)];
     }
 
-    private String iban() {
-        return ibans[(int) (Math.random() * ibans.length)];
-    }
+
 
 }
 
